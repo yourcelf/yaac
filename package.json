@@ -1,0 +1,29 @@
+{
+  "name": "yaac",
+  "version": "0.0.0",
+  "description": "Yet another asset compiler",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha test/*.spec.js"
+  },
+  "repository": "",
+  "dependencies": {
+    "less": "*",
+    "stylus": "*",
+    "nib": "*",
+    "snockets": "*",
+    "underscore": "*"
+  },
+  "devDependencies": {
+      "mocha": "*",
+      "expect.js": "*"
+  },
+  "keywords": [
+    "assets",
+    "coffeescript",
+    "less",
+    "stylus"
+  ],
+  "author": "Charlie DeTar <cfd@media.mit.edu>",
+  "license": "BSD"
+}
