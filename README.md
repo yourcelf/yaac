@@ -8,6 +8,40 @@ wanted. It is intended to be used to concatenate and minify assets in production
 
 Still rather alpha.
 
+Compiles less, stylus, and coffeescript.
+
+WARNING: requiring this module this monkey-patches ``less`` to import files
+synchronously, which is necessary to use this during synchronous template
+rendering. If you use less separately, this could be an issue.
+
+Here's how it works:
+
+           ______________________________________
+          |                BEGIN                 |
+          | Look asset up in compiled path cache |
+          |______________________________________| 
+                            |
+                           _|_____
+           ________no____ / null? \_____yes____
+       ____|________      \_______/           |      ______
+      / production? \                     ____|_____/      \
+     /\_____________/\                    | compile |       \
+    no                yes                 |_________|        \
+    |                   \                     |               \
+    |                    \                ____|________        |
+    \_________________    \               | store path |       |
+     | calculate hash |    \              | in cache   |       |
+     |________________|     \             |____________|       |
+          ____|_____         \               |                 |
+         / changed? \         \              |                 |
+        /\__________/\         \             |                 |
+      yes             no        \            |                 |
+       |               \         \   ________|______________   |
+       |                \_________\__| return compiled path |  |
+       |                             |______________________|  |
+        \______________________________________________________/
+
+
 Installation
 ------------
 
@@ -24,7 +58,7 @@ Initialize with:
 
 The options are:
 * ``searchPath``: A list of absolute paths to source directories. Default:
-  ``assets`` relative to 2-levels up from yaac's installed folder (assuming
+  ``__dirname/../../../assets``, where ``__dirname`` is the ``yaac/lib``.
   it's in ``node_modules``, that's your project root).
 * ``dest``: An absolute path to the directory in which to put compiled assets.
   Default: ``builtAssets``, same root as ``assets``
