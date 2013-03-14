@@ -115,6 +115,13 @@ describe("Assets", function() {
         _compareOps("a.coffee", "a.edbb910a5be3a5b395f2c52f3632ab0f.js");
     });
 
+    it("copies arbitrary files without modification", function() {
+        var outName = "spinner.86b1ac6d1c485d54efa3a53643e91ceb.gif"
+        _compareOps("spinner.gif", outName);
+        expect(fs.readFileSync(__dirname + "/assets/spinner.gif")).to.eql(
+               fs.readFileSync(__dirname + "/builtAssets/" + outName));
+    });
+
     it("is super performant in production", function() {
         var start = new Date().getTime();
         process.env.NODE_ENV = "production";
