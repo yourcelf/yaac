@@ -103,7 +103,7 @@ Synchronous compilation is necessary to work smoothly as helpers within template
 Usage in templates
 ------------------
 
-Using express 3.x, simply set ``yaac.assets`` as a member of ``app.locals``:
+Using express 3.x, simply set ``yaac.asset`` as a member of ``app.locals``:
 
     app.locals.asset = yaac.asset
 

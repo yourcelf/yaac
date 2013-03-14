@@ -9,7 +9,7 @@ var settings = {
     dest: path.join(__dirname, "/builtAssets")
 };
 
-var assets  = require("../lib/assets")(settings);
+var yaac = require("../lib/yaac")(settings);
 
 describe("Assets", function() {
     before(function(done) {
@@ -24,12 +24,12 @@ describe("Assets", function() {
         
     it("finds assets", function() {
         // Find assets by name within the configured search path.
-        expect(assets._findFile("a.less", settings.searchPath)[0]).to.be(
+        expect(yaac._findFile("a.less", settings.searchPath)[0]).to.be(
             __dirname + "/assets/a.less");
-        expect(assets._findFile("dir1/c.styl", settings.searchPath)[0]).to.be(
+        expect(yaac._findFile("dir1/c.styl", settings.searchPath)[0]).to.be(
             __dirname + "/assets/dir1/c.styl");
         expect(function() {
-            assets._findFile("bogus.styl", settings.searchPath);
+            yaac._findFile("bogus.styl", settings.searchPath);
         }).to.throwException(function (e) {
             expect(e.code).to.be('ENOENT');
         });
@@ -39,7 +39,7 @@ describe("Assets", function() {
         // Find the dependencies of a stylus file -- rough tracking of
         // `@import` statements.
         var fn = __dirname + "/assets/a.styl";
-        var deps = assets._findDeps[".styl"](fn, fs.statSync(fn), []);
+        var deps = yaac._findDeps[".styl"](fn, fs.statSync(fn), []);
         var names = _.map(deps, function(dep) { return dep.path });
         expect(names).to.eql([
             __dirname + "/assets/a.styl",
@@ -54,7 +54,7 @@ describe("Assets", function() {
         // @import-multiple or anything but plain vanilla @import. But it
         // should be enough to work with bootstrap.
         var fn = __dirname + "/assets/a.less";
-        var deps = assets._findDeps[".less"](fn, fs.statSync(fn), []);
+        var deps = yaac._findDeps[".less"](fn, fs.statSync(fn), []);
         var names = _.map(deps, function(dep) { return dep.path });
         expect(names).to.eql([
             __dirname + "/assets/a.less",
@@ -66,7 +66,7 @@ describe("Assets", function() {
     it("finds coffee dependencies", function() {
         // Snockets-based //= require dependency tracking.
         var fn = __dirname + "/assets/a.coffee"
-        var deps = assets._findDeps[".coffee"](fn, fs.statSync(fn), []);
+        var deps = yaac._findDeps[".coffee"](fn, fs.statSync(fn), []);
         var names = _.map(deps, function(dep) { return dep.path });
         // these come in reverse, because snockets recognizes the necessary
         // order for 'require's; for our purposes we don't care about order,
@@ -82,22 +82,22 @@ describe("Assets", function() {
     var _compareOps = function(fromName, toName) {
         /*
         * Make sure that not only is the result the proper name, but the
-        * operations assets.asset reports that it performed are what we expect.
+        * operations yaac.asset reports that it performed are what we expect.
         * No unnecessary compilation here.
         */
         process.env.NODE_ENV = "";
         var operations = [];
-        expect(assets.asset(fromName, operations)).to.be("/static/" + toName)
+        expect(yaac.asset(fromName, operations)).to.be("/static/" + toName)
         expect(operations).to.eql(["findDeps", "compile"]);
 
         operations = [];
-        expect(assets.asset(fromName, operations)).to.be("/static/" + toName);
+        expect(yaac.asset(fromName, operations)).to.be("/static/" + toName);
         expect(operations).to.eql(["findDeps", "compare"]);
         
         // in production, no extra comparison/compilation, just serve cache
         process.env.NODE_ENV = "production";
         operations = [];
-        expect(assets.asset(fromName, operations)).to.be("/static/" + toName);
+        expect(yaac.asset(fromName, operations)).to.be("/static/" + toName);
         expect(operations).to.eql([]);
         process.env.NODE_ENV = "";
         expect(fs.existsSync(__dirname + "/builtAssets/" + toName)).to.be(true);
@@ -127,11 +127,11 @@ describe("Assets", function() {
         process.env.NODE_ENV = "production";
         var ops = [];
         for (var i = 0; i < 10; i++) {
-            expect(assets.asset("a.styl"), ops).to.be(
+            expect(yaac.asset("a.styl"), ops).to.be(
                 "/static/a.8fc05d2ac9d397e5051044b93654b581.css")
-            expect(assets.asset("a.less"), ops).to.be(
+            expect(yaac.asset("a.less"), ops).to.be(
                 "/static/a.038c52b7b0c28a4957bdd811fd4b6189.css")
-            expect(assets.asset("a.coffee"), ops).to.be(
+            expect(yaac.asset("a.coffee"), ops).to.be(
                 "/static/a.edbb910a5be3a5b395f2c52f3632ab0f.js")
         }
         expect(ops).to.eql([]);
@@ -142,11 +142,11 @@ describe("Assets", function() {
     it("recompiles when file changes in dev", function() {
         process.env.NODE_ENV = "";
         // ensure we've cached this.
-        expect(assets.asset("a.coffee")).to.be(
+        expect(yaac.asset("a.coffee")).to.be(
             "/static/a.edbb910a5be3a5b395f2c52f3632ab0f.js")
         // yup, cached....
         var ops = [];
-        expect(assets.asset("a.coffee", ops)).to.be(
+        expect(yaac.asset("a.coffee", ops)).to.be(
             "/static/a.edbb910a5be3a5b395f2c52f3632ab0f.js")
         expect(ops).to.eql(["findDeps", "compare"]);
 
@@ -156,7 +156,7 @@ describe("Assets", function() {
         
         // now it should recompile.
         ops = []
-        expect(assets.asset("a.coffee", ops)).to.be(
+        expect(yaac.asset("a.coffee", ops)).to.be(
             "/static/a.edbb910a5be3a5b395f2c52f3632ab0f.js")
         expect(ops).to.eql(["findDeps", "compare", "compile"]);
     });
