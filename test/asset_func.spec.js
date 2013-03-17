@@ -112,7 +112,7 @@ describe("Assets", function() {
     });
 
     it("compiles coffee", function() {
-        _compareOps("a.coffee", "a.edbb910a5be3a5b395f2c52f3632ab0f.js");
+        _compareOps("a.coffee", "a.af7ed6a10d11c363b0d6019b2bae0241.js");
     });
 
     it("copies arbitrary files without modification", function() {
@@ -132,7 +132,7 @@ describe("Assets", function() {
             expect(yaac.asset("a.less"), ops).to.be(
                 "/static/a.038c52b7b0c28a4957bdd811fd4b6189.css")
             expect(yaac.asset("a.coffee"), ops).to.be(
-                "/static/a.edbb910a5be3a5b395f2c52f3632ab0f.js")
+                "/static/a.af7ed6a10d11c363b0d6019b2bae0241.js")
         }
         expect(ops).to.eql([]);
         expect(new Date().getTime() - start).to.be.lessThan(100);
@@ -143,11 +143,11 @@ describe("Assets", function() {
         process.env.NODE_ENV = "";
         // ensure we've cached this.
         expect(yaac.asset("a.coffee")).to.be(
-            "/static/a.edbb910a5be3a5b395f2c52f3632ab0f.js")
+            "/static/a.af7ed6a10d11c363b0d6019b2bae0241.js")
         // yup, cached....
         var ops = [];
         expect(yaac.asset("a.coffee", ops)).to.be(
-            "/static/a.edbb910a5be3a5b395f2c52f3632ab0f.js")
+            "/static/a.af7ed6a10d11c363b0d6019b2bae0241.js")
         expect(ops).to.eql(["findDeps", "compare"]);
 
         // "touch" a file it depends on.
@@ -157,7 +157,7 @@ describe("Assets", function() {
         // now it should recompile.
         ops = []
         expect(yaac.asset("a.coffee", ops)).to.be(
-            "/static/a.edbb910a5be3a5b395f2c52f3632ab0f.js")
+            "/static/a.af7ed6a10d11c363b0d6019b2bae0241.js")
         expect(ops).to.eql(["findDeps", "compare", "compile"]);
     });
 });
