@@ -3,6 +3,7 @@ var path    = require("path");
 var fs      = require("fs");
 var _       = require("underscore");
 var utils   = require("../lib/utils");
+var crypto  = require("crypto");
 
 var settings = {
     searchPath: [path.join(__dirname, "assets")],
@@ -10,6 +11,15 @@ var settings = {
 };
 
 var yaac = require("../lib/yaac")(settings);
+
+var get_hash_of = function(string) {
+    var hash = crypto.createHash('md5');
+    hash.update(string);
+    return hash.digest('hex');
+}
+var styl_hash = get_hash_of("h1{font-family:monospace}\nbody{background-color:#ffc0cb}\nspan.fun{color:#f00}\n");
+var less_hash = get_hash_of("span.fun{color:green;}\np{color:red;}\nh1{font-family:\"monospace\";}\n");
+var coffee_hash = get_hash_of('(function() {\n  var fun;\n\n  fun = "YEAH";\n\n}).call(this);\n\n//= require d\n\n(function() {\n\n\n}).call(this);\n\n(function() {\n\n\n}).call(this);\n');
 
 describe("Assets", function() {
     before(function(done) {
@@ -104,15 +114,15 @@ describe("Assets", function() {
     };
 
     it("compiles stylus", function() {
-        _compareOps("a.styl", "a.8fc05d2ac9d397e5051044b93654b581.css");
+        _compareOps("a.styl", "a." + styl_hash + ".css");
     });
 
     it("compiles less", function() {
-        _compareOps("a.less", "a.038c52b7b0c28a4957bdd811fd4b6189.css");
+        _compareOps("a.less", "a." + less_hash + ".css");
     });
 
     it("compiles coffee", function() {
-        _compareOps("a.coffee", "a.af7ed6a10d11c363b0d6019b2bae0241.js");
+        _compareOps("a.coffee", "a." + coffee_hash + ".js");
     });
 
     it("copies arbitrary files without modification", function() {
@@ -128,11 +138,11 @@ describe("Assets", function() {
         var ops = [];
         for (var i = 0; i < 10; i++) {
             expect(yaac.asset("a.styl"), ops).to.be(
-                "/static/a.8fc05d2ac9d397e5051044b93654b581.css")
+                "/static/a." + styl_hash + ".css")
             expect(yaac.asset("a.less"), ops).to.be(
-                "/static/a.038c52b7b0c28a4957bdd811fd4b6189.css")
+                "/static/a." + less_hash + ".css")
             expect(yaac.asset("a.coffee"), ops).to.be(
-                "/static/a.af7ed6a10d11c363b0d6019b2bae0241.js")
+                "/static/a." + coffee_hash + ".js")
         }
         expect(ops).to.eql([]);
         expect(new Date().getTime() - start).to.be.lessThan(100);
@@ -143,11 +153,11 @@ describe("Assets", function() {
         process.env.NODE_ENV = "";
         // ensure we've cached this.
         expect(yaac.asset("a.coffee")).to.be(
-            "/static/a.af7ed6a10d11c363b0d6019b2bae0241.js")
+            "/static/a." + coffee_hash + ".js")
         // yup, cached....
         var ops = [];
         expect(yaac.asset("a.coffee", ops)).to.be(
-            "/static/a.af7ed6a10d11c363b0d6019b2bae0241.js")
+            "/static/a." + coffee_hash + ".js")
         expect(ops).to.eql(["findDeps", "compare"]);
 
         // "touch" a file it depends on.
@@ -157,7 +167,7 @@ describe("Assets", function() {
         // now it should recompile.
         ops = []
         expect(yaac.asset("a.coffee", ops)).to.be(
-            "/static/a.af7ed6a10d11c363b0d6019b2bae0241.js")
+            "/static/a." + coffee_hash + ".js")
         expect(ops).to.eql(["findDeps", "compare", "compile"]);
     });
 });
