@@ -6,7 +6,10 @@
   "scripts": {
     "test": "mocha test/*.spec.js"
   },
-  "repository": "",
+  "repository": {
+      "type": "git",
+      "url": "https://github.com/yourcelf/yaac.git"
+  },
   "dependencies": {
     "less": "*",
     "stylus": "*",

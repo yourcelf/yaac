@@ -60,8 +60,8 @@ Initialize with:
 
 The options are:
 * ``searchPath``: A list of absolute paths to source directories. Default:
-  ``__dirname/../../../assets``, where ``__dirname`` is the ``yaac/lib``.
-  it's in ``node_modules``, that's your project root).
+  ``["__dirname/../../../assets"]``, where ``__dirname`` is the ``yaac/lib``.
+  Assuming it's in ``node_modules``, that's your project root).
 * ``dest``: An absolute path to the directory in which to put compiled assets.
   Default: ``builtAssets``, same root as ``assets``
 * ``urlPrefix``: a string to prepend to printed URL's.  Default: ``/static/``.
